@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@yz1311/react-native-signature-pad": "^0.1.5",
+    "react-native-webview": "^13.8.1"
+  }
+}
