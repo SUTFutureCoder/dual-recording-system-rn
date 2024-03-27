@@ -12,8 +12,12 @@ function Id({navigation}): React.JSX.Element {
       <View style={{marginTop: 0, height: "100%"}}>
         <View style={{flexDirection: 'row', alignItems: 'stretch'}}>
           <View style={{flex: 5}}>
-            <Image source={require('./assets/id.jpeg')} style={{ width: '100%', height: "90%"}}></Image>
-            <Button title={"文件"} onPress={() => {isActive = false; navigation.navigate('PdfPage');}}></Button>
+            <ScrollView style={{ width: '100%', height: "90%"}}  >
+              <View style={{alignItems: 'center', justifyContent: 'center', marginTop: 20}}>
+                <Image source={require('./assets/id.jpeg')} ></Image>
+              </View>
+            </ScrollView>
+            <Button title={"签约"} onPress={() => {isActive = false; navigation.navigate('Sign');}}></Button>
           </View>
 
           <View style={{flex: 1, marginLeft: 10, marginRight: 5}}>

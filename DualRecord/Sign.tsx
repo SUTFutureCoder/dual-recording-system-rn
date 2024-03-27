@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Button, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import SignaturePad from 'react-native-signature-pad';
 import { Camera, useCameraDevice } from "react-native-vision-camera";
 
@@ -7,9 +7,16 @@ var penMinWidth = 2;  // Default value: 1
 var penMaxWidth = 3;  // Default value: 4
 
 function Sign({navigation}): React.JSX.Element {
+
+  let final_sign_data = ''
+  let _signaturePadChange = ({base64DataUrl}) => {
+    final_sign_data = base64DataUrl
+  };
+
   Camera.requestCameraPermission();
   let device = useCameraDevice('front');
   let isActive = true;
+
   return (
     <SafeAreaView>
       <View style={{marginTop: 0, height: "100%"}}>
@@ -18,10 +25,11 @@ function Sign({navigation}): React.JSX.Element {
             <SignaturePad
               penMinWidth={penMinWidth}
               penMaxWidth={penMaxWidth}
+              onChange={_signaturePadChange}
               style={{flex: 1, backgroundColor: 'white'}}
               useFont={false}
             />
-            <Button title={"身份证录入"} onPress={() => {isActive = false; navigation.navigate('Id');}}></Button>
+            <Button title={"确认签约"} onPress={() => {isActive = false; navigation.navigate('FinSign', {sign_64: final_sign_data});}}></Button>
           </View>
 
           <View style={{flex: 1, marginLeft: 10, marginRight: 5}}>

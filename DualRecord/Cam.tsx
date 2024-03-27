@@ -60,7 +60,7 @@ function Cam({navigation}): React.JSX.Element {
               </Text>
             </ScrollView>
             <View>
-              <Button title={'签约'} onPress={() => {isActive = false;navigation.navigate('Sign');}} ></Button>
+              <Button title={'阅读条款'} onPress={() => {isActive = false;navigation.navigate('PdfPage');}} ></Button>
             </View>
           </View>
         </View>
