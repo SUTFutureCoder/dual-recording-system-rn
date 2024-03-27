@@ -1,12 +1,12 @@
 import React from 'react';
-import { Button, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Button, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import {Camera, useCameraDevice} from 'react-native-vision-camera';
 
 function Cam({navigation}): React.JSX.Element {
   Camera.requestCameraPermission();
-  const device = useCameraDevice('front');
-
+  let device = useCameraDevice('front');
+  let isActive = true;
   return (
     <SafeAreaView>
       <View style={{flexDirection: 'column', marginTop: 0, height: "100%"}}>
@@ -18,7 +18,7 @@ function Cam({navigation}): React.JSX.Element {
             <Camera
               style={[StyleSheet.absoluteFill, {height: "100%"}]}
               device={device}
-              isActive={true}
+              isActive={isActive}
             />
           </View>
           <View style={{flex: 1, marginLeft: 10, marginRight: 5}}>
@@ -60,7 +60,7 @@ function Cam({navigation}): React.JSX.Element {
               </Text>
             </ScrollView>
             <View>
-              <Button title={'签约'} onPress={() => navigation.navigate('Sign')} ></Button>
+              <Button title={'签约'} onPress={() => {isActive = false;navigation.navigate('Sign');}} ></Button>
             </View>
           </View>
         </View>
