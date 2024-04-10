@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Button,
+  Button, Dimensions,
   Image,
   SafeAreaView,
   ScrollView,
@@ -10,43 +10,87 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import SignaturePad from "@yz1311/react-native-signature-pad";
-import { Camera, useCameraDevice } from "react-native-vision-camera";
+import Sound from 'react-native-sound';
 
+const screenWidth = Dimensions.get('window').width; // 获取屏幕宽度
+const screenHeight = Dimensions.get('window').height; // 获取屏幕宽度
 function Logo({navigation}): React.JSX.Element {
-  Camera.requestCameraPermission();
-  let device = useCameraDevice('front');
-  let isActive = true;
-  return (
-    <SafeAreaView>
-      <View style={{marginTop: 0, height: "100%"}}>
-        <View style={{flexDirection: 'row', alignItems: 'stretch'}}>
-          <View style={{flex: 5}}>
-            <View style={{alignItems: 'center', justifyContent: 'center', marginTop: 0}}>
-              <TouchableHighlight style={{height: "100%", width: '100%'}} onPress={() => {isActive = navigation.navigate('Cam');}}>
-                <Image resizeMode={'cover'} style={{height: "100%", width: '100%'}} source={require('./assets/2a2005bfb7328a5.jpg')} ></Image>
-              </TouchableHighlight>
-            </View>
-          </View>
+  const stage16 = () => {
+    const sound = new Sound(require('./assets/stage16.mp3'), (error) => {
+      if (!error) {
+        sound.play((success) => {
+          sound.release();
+          if (success) {
+            console.log('音频14播放完成');
+          }
+        });
+      }
+    });
+  };
 
-          <View style={{flex: 1}}>
-            <View  style={{height: "25%", marginBottom: 5}}>
-              <Camera
-                style={[StyleSheet.absoluteFill, {height: "100%"}]}
-                device={device}
-                isActive={isActive}
-              />
-            </View>
-            <ScrollView style={{height: "70%", marginBottom: 5}} >
-              <Text style={{fontSize: 15}}>
-              </Text>
-            </ScrollView>
+  stage16()
+  return (
+    <View style={styles.container}>
+      <View>
+      <Image
+        source={require('./assets/final3.png')}
+        resizeMode="stretch" // 横向拉伸以填满容器
+        style={styles.image}
+      />
+        <View style={{
+          position: 'absolute', // 绝对定位
+          bottom: 0, // 定位到图片顶部
+          left: 0, // 定位到图片左侧
+          right: 0, // 定位到图片右侧
+          height: '20%', // 高度为屏幕高度的5%
+          backgroundColor: 'rgba(128, 128, 128, 0.5)', // 灰色透明背景
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingHorizontal: 10,
+          zIndex: 9999
+        }}>
+          <Text style={{ color: '#FFFFFF', fontSize: 15 }}>本次录制即将结束，销售人员和客户如有补充说明请在此环节补充。如无补充，请点击结束录制</Text>
+          <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity style={styles.button2} onPress={() => navigation.navigate('Last1')}>
+              <Text style={styles.buttonText}>结束录制</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
+
   );
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center', // 纵向居中
+    alignItems: 'center', // 横向居中
+    backgroundColor: '#fff', // 可选背景颜色
+  },
+  image: {
+    width: screenWidth, // 设置图片宽度为屏幕宽度
+    height: "70%", // 高度自动调整以保持图片的宽高比
+    aspectRatio: 3.82, // 你可以根据图片实际宽高比进行调整
+  },
+  button1: {
+    backgroundColor: "#367bd8",
+    padding: 10,
+    marginHorizontal: 5,
+    borderRadius: 5
+  },
+  button2: {
+    backgroundColor: "#ff361e",
+    padding: 10,
+    marginHorizontal: 5,
+    borderRadius: 5
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: 15
+  }
+});
 
 export default Logo;

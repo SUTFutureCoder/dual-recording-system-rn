@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect } from "react";
 import { Alert, Button, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import SignaturePad from 'react-native-signature-pad';
 import { Camera, useCameraDevice } from "react-native-vision-camera";
+import Orientation from "react-native-orientation-locker";
+import Sound from "react-native-sound";
 
 var penMinWidth = 2;  // Default value: 1
 var penMaxWidth = 3;  // Default value: 4
@@ -13,10 +15,27 @@ function Sign({navigation}): React.JSX.Element {
     final_sign_data = base64DataUrl
   };
 
-  Camera.requestCameraPermission();
   let device = useCameraDevice('front');
   let isActive = true;
 
+  useEffect(() => {
+    stage12();
+    Camera.requestCameraPermission();
+    Orientation.lockToLandscapeRight();
+  }, []);
+
+  const stage12 = () => {
+    const sound = new Sound(require('./assets/stage12.mp3'), (error) => {
+      if (!error) {
+        sound.play((success) => {
+          sound.release();
+          if (success) {
+            console.log('音频12播放完成');
+          }
+        });
+      }
+    });
+  };
   return (
     <SafeAreaView>
       <View style={{marginTop: 0, height: "100%"}}>
@@ -29,20 +48,20 @@ function Sign({navigation}): React.JSX.Element {
               style={{flex: 1, backgroundColor: 'white'}}
               useFont={false}
             />
-            <Button title={"确认签约"} onPress={() => {isActive = false; navigation.navigate('FinSign', {sign_64: final_sign_data});}}></Button>
+            <Button color={"#ff361e"} title={"提交"} onPress={() => {isActive = false; navigation.navigate('PdfPageNoticeWithSign', {sign_64: final_sign_data});}}></Button>
           </View>
 
-          <View style={{flex: 1, marginLeft: 10, marginRight: 5}}>
-            <View  style={{height: "25%", marginBottom: 5}}>
+          <View style={{ flex: 1, marginLeft: 10, marginRight: 5 }}>
+            <View style={{ height: "25%", marginBottom: 5 }}>
               <Camera
-                style={[StyleSheet.absoluteFill, {height: "100%"}]}
+                style={[StyleSheet.absoluteFill, { height: "100%" }]}
                 device={device}
                 isActive={isActive}
               />
             </View>
-            <ScrollView style={{height: "70%", marginBottom: 5}} >
-              <Text style={{fontSize: 15}}>
-                请在左侧签署您的姓名
+            <ScrollView style={{ height: "70%", marginBottom: 5 }}>
+              <Text style={{ fontSize: 20 }}>
+
               </Text>
             </ScrollView>
           </View>
