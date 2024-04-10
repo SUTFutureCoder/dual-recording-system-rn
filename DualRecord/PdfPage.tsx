@@ -23,7 +23,7 @@ function PdfPage({navigation}): React.JSX.Element {
   useEffect(() => {
     stage7();
     Camera.requestCameraPermission();
-    Orientation.lockToLandscapeRight();
+    Orientation.lockToLandscapeLeft();
   }, []);
 
 
@@ -105,7 +105,7 @@ function PdfPage({navigation}): React.JSX.Element {
               style={styles.pdf}/>
           </View>
 
-          <View style={{flex: 1, marginLeft: 10, marginRight: 5}}>
+          <View style={{flex: 1, width: '100%',  marginLeft: 10, marginRight: 5}}>
             <View  style={{height: "25%", marginBottom: 5}}>
               <Camera
                 style={[StyleSheet.absoluteFill, {height: "100%"}]}
@@ -113,8 +113,8 @@ function PdfPage({navigation}): React.JSX.Element {
                 isActive={isActive}
               />
             </View>
-            <View style={{  marginLeft: 10,  height: "75%" }}>
-              <View style={{ height: '100%' }}>
+            <View style={{ height: "75%" }}>
+              <View style={{  height: '100%', width: '140%' }}>
                 <Image resizeMode={'stretch'} style={{ width: '100%', height: '100%' }} source={rightGif}></Image>
               </View>
             </View>

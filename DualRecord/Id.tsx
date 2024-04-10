@@ -8,12 +8,12 @@ function Id({navigation}): React.JSX.Element {
   useEffect(() => {
     stage6();
     Camera.requestCameraPermission();
-    Orientation.lockToLandscapeRight();
+    Orientation.lockToLandscapeLeft();
   }, []);
 
   let device = useCameraDevice('front');
   let isActive = true;
-  Orientation.lockToLandscapeRight();
+  Orientation.lockToLandscapeLeft();
 
 
   const stage6 = () => {

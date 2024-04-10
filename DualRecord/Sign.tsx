@@ -21,7 +21,7 @@ function Sign({navigation}): React.JSX.Element {
   useEffect(() => {
     stage12();
     Camera.requestCameraPermission();
-    Orientation.lockToLandscapeRight();
+    Orientation.lockToLandscapeLeft();
   }, []);
 
   const stage12 = () => {

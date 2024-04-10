@@ -16,7 +16,7 @@ function Cam({ navigation }): React.JSX.Element {
   useEffect(() => {
     stage1();
     Camera.requestCameraPermission();
-    Orientation.lockToLandscapeRight();
+    Orientation.lockToLandscapeLeft();
   }, []);
 
   const stage1 = () => {
@@ -50,8 +50,8 @@ function Cam({ navigation }): React.JSX.Element {
   };
 
   const stage3 = () => {
+    setRightGif(sound_gif)
     setRightText('请保险经纪人薛晓舟与投保人钟宁女士同框出镜，并且在后续录制过程中保持同框。')
-    setRightGif(sound_gif);
     const sound = new Sound(require('./assets/stage3.mp3'), (error) => {
       if (!error) {
         sound.play((success) => {
@@ -71,6 +71,7 @@ function Cam({ navigation }): React.JSX.Element {
       if (!error) {
         sound.play((success) => {
           if (success) {
+            setRightGif(mic_gif)
             console.log('音频4播放完成');
             setTimeout(stage5, 1500);
           }
@@ -81,6 +82,7 @@ function Cam({ navigation }): React.JSX.Element {
   };
 
   const stage5 = () => {
+    setRightGif(sound_gif)
     setRightText('本次为您办理的销售人员是太盈国际保险经纪有限公司的保险经纪人薛晓舟。')
     const sound = new Sound(require('./assets/stage5.mp3'), (error) => {
       if (!error) {

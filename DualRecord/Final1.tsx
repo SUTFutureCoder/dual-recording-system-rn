@@ -18,12 +18,12 @@ function Final1({navigation}): React.JSX.Element {
   useEffect(() => {
     stage15();
     Camera.requestCameraPermission();
-    Orientation.lockToLandscapeRight();
+    Orientation.lockToLandscapeLeft();
   }, []);
 
   let device = useCameraDevice('front');
   let isActive = true;
-  Orientation.lockToLandscapeRight();
+  Orientation.lockToLandscapeLeft();
 
 
   const stage15 = () => {
