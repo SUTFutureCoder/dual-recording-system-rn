@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  AppState, BackHandler,
   Image,
   SafeAreaView,
   ScrollView,
@@ -19,19 +20,40 @@ const sound_gif = require("./assets/sound.gif");
 const mic_gif = require("./assets/mic.gif");
 
 function Cam({ navigation }): React.JSX.Element {
+  Orientation.lockToLandscapeLeft();
+  const [appState, setAppState] = useState(AppState.currentState);
   const [rightText, setRightText] = useState(initialText);
   const [rightGif, setRightGif] = useState(sound_gif);
   const [showFirstPic, setShowFirstPic] = useState(true);
   const [showPicCover, setShowPicCover] = useState(true);
+  const soundRef = useRef(null);  // 使用 useRef 来持久化声音实例
 
   useEffect(() => {
-    // stage1();
     Camera.requestCameraPermission();
-    Orientation.lockToLandscapeLeft();
+    // Orientation.lockToLandscapeLeft();
+    // App state change listener
+    const appStateListener = AppState.addEventListener("change", _handleAppStateChange);
+
+    // Hardware back press listener
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", handleBackPress);
+
+    // navigation.addListener('focus', () => {
+    //     stage1();
+    // });
+
+    return () => {
+      // Clean up: release sound and remove listeners
+      soundRef.current?.release();
+      appStateListener.remove();
+      backHandler.remove();
+    };
   }, []);
 
+  let s: Sound;
   const stage1 = () => {
     let sound = new Sound(require("./assets/stage1.mp3"), (error) => {
+      s = sound
+      soundRef.current = sound;
       if (!error) {
         sound.play((success) => {
           if (success) {
@@ -40,6 +62,7 @@ function Cam({ navigation }): React.JSX.Element {
             stage2();
           }
           sound.release();
+          soundRef.current = null;
         });
       }
     });
@@ -47,6 +70,8 @@ function Cam({ navigation }): React.JSX.Element {
 
   const stage2 = () => {
     const sound = new Sound(require("./assets/stage2.mp3"), (error) => {
+      s = sound
+      soundRef.current = sound;
       if (!error) {
         sound.play((success) => {
           if (success) {
@@ -55,6 +80,7 @@ function Cam({ navigation }): React.JSX.Element {
             setTimeout(stage3, 1500);
           }
           sound.release();
+          soundRef.current = null;
         });
       }
     });
@@ -64,6 +90,8 @@ function Cam({ navigation }): React.JSX.Element {
     setRightGif(sound_gif);
     setRightText("请保险经纪人薛晓舟与投保人钟宁女士同框出镜，并且在后续录制过程中保持同框。");
     const sound = new Sound(require("./assets/stage3.mp3"), (error) => {
+      s = sound
+      soundRef.current = sound;
       if (!error) {
         sound.play((success) => {
           if (success) {
@@ -71,6 +99,7 @@ function Cam({ navigation }): React.JSX.Element {
             setTimeout(stage4, 1500);
           }
           sound.release();
+          soundRef.current = null;
         });
       }
     });
@@ -79,6 +108,8 @@ function Cam({ navigation }): React.JSX.Element {
   const stage4 = () => {
     setRightText("此次录音录像过程对于今后您维护权益非常关键，请您认真阅读您签署文件的具体内容，如实回答相关问题。如果销售人员向您作出任何与书面文件内容不一致都是无效的，您是否清楚。");
     const sound = new Sound(require("./assets/stage4.mp3"), (error) => {
+      s = sound
+      soundRef.current = sound;
       if (!error) {
         sound.play((success) => {
           if (success) {
@@ -87,6 +118,7 @@ function Cam({ navigation }): React.JSX.Element {
             setTimeout(stage5, 1500);
           }
           sound.release();
+          soundRef.current = null;
         });
       }
     });
@@ -96,6 +128,8 @@ function Cam({ navigation }): React.JSX.Element {
     setRightGif(sound_gif);
     setRightText("本次为您办理的销售人员是太盈国际保险经纪有限公司的保险经纪人薛晓舟。");
     const sound = new Sound(require("./assets/stage5.mp3"), (error) => {
+      s = sound
+      soundRef.current = sound;
       if (!error) {
         sound.play((success) => {
           if (success) {
@@ -103,9 +137,27 @@ function Cam({ navigation }): React.JSX.Element {
             navigation.navigate("Id");
           }
           sound.release();
+          soundRef.current = null;
         });
       }
     });
+  };
+
+  const handleBackPress = () => {
+    Orientation.lockToPortrait();
+    soundRef.current?.stop();  // 停止播放声音
+    // navigation.goBack();
+    return false;
+  };
+
+  const _handleAppStateChange = (nextAppState) => {
+    if (appState.match(/inactive|background/) && nextAppState === 'active') {
+      console.log('App has come to the foreground!');
+    } else if (nextAppState === 'background') {
+      console.log('App has gone to the background!');
+      soundRef.current?.stop();  // 停止播放声音
+    }
+    // setAppState(nextAppState);
   };
 
   const device = useCameraDevice("front");
@@ -144,23 +196,29 @@ function Cam({ navigation }): React.JSX.Element {
           }} source={require("./assets/b331c9eb54e6ce466d9100812131f8d0.png")}/>
         </TouchableWithoutFeedback>
       </View>
-      <View style={{ flexDirection: "column", marginTop: 0, height: "100%" }}>
+      <View style={{ flexDirection: showPicCover ? undefined : "column", marginTop: 0, height: "100%" }}>
         <View style={{ flexDirection: "row", alignItems: "stretch" }}>
-          <View style={{ flex: 4 }}>
+          <View style={{ flex: showPicCover ?  10 : 4 }}>
             <Camera
-              style={[StyleSheet.absoluteFill, { height: "100%" }]}
+              style={[StyleSheet.absoluteFill, { height: "100%", width: showPicCover ? "120%" : "100%" }]}
               device={device}
               isActive={isActive}
             />
           </View>
           <View style={{ flex: 1, marginLeft: 10, marginRight: 5, height: "100%" }}>
-            <ScrollView style={{ height: "92%", marginBottom: 5 }}>
-              <Text style={{ fontSize: 20 }}>
+            <ScrollView style={{ height: "92%", marginBottom: 5}}>
+              <Text style={{ fontSize: 20, display: showPicCover ? "none" : undefined }}>
                 {rightText}
               </Text>
             </ScrollView>
             <View style={{height: "8%"}}>
-              <Image resizeMode={"contain"} style={{ width: "100%", height: "1000%", bottom: "600%",  display: showPicCover ? "none" : undefined }} source={rightGif}></Image>
+              <TouchableWithoutFeedback onPress={() => {if (s !== undefined) {
+                s.stop().release()
+              }
+              soundRef.current?.stop();
+              navigation.navigate("Id")}}>
+                <Image resizeMode={"contain"} style={{ width: "100%", height: "1000%", bottom: "600%",  display: showPicCover ? "none" : undefined }} source={rightGif}></Image>
+              </TouchableWithoutFeedback>
             </View>
           </View>
         </View>

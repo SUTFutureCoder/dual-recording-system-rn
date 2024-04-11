@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Button, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {  AppState, BackHandler, Button, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import SignaturePad from "react-native-signature-pad";
 import { Camera, useCameraDevice } from "react-native-vision-camera";
 import Orientation from "react-native-orientation-locker";
@@ -9,28 +9,44 @@ var penMinWidth = 2;  // Default value: 1
 var penMaxWidth = 3;  // Default value: 4
 
 function Sign({ navigation }): React.JSX.Element {
-
-  let final_sign_data = "";
-  let _signaturePadChange = ({ base64DataUrl }) => {
-    final_sign_data = base64DataUrl;
-  };
+  Orientation.lockToLandscapeLeft();
+  // let final_sign_data = "";
+  // let _signaturePadChange = ({ base64DataUrl }) => {
+  //   final_sign_data = base64DataUrl;
+  // };
+  const [appState, setAppState] = useState(AppState.currentState);
+  const soundRef = useRef(null);  // 使用 useRef 来持久化声音实例
 
   let device = useCameraDevice("front");
   let isActive = true;
 
   useEffect(() => {
-    stage12();
-    Camera.requestCameraPermission();
-    Orientation.lockToLandscapeLeft();
+
+    // Camera.requestCameraPermission();
+
+    // App state change listener
+    const appStateListener = AppState.addEventListener("change", _handleAppStateChange);
+
+    // Hardware back press listener
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", handleBackPress);
+
+    return () => {
+      // Clean up: release sound and remove listeners
+      soundRef.current?.release();
+      appStateListener.remove();
+      backHandler.remove();
+    };
   }, []);
 
   let s: Sound
   const stage12 = () => {
     const sound = new Sound(require("./assets/stage12.mp3"), (error) => {
       s = sound
+      soundRef.current = sound;
       if (!error) {
         sound.play((success) => {
           sound.release();
+          soundRef.current = null;
           if (success) {
             console.log("音频12播放完成");
           }
@@ -38,6 +54,25 @@ function Sign({ navigation }): React.JSX.Element {
       }
     });
   };
+
+  stage12();
+
+  const handleBackPress = () => {
+    soundRef.current?.stop();  // 停止播放声音
+    navigation.goBack();
+    return true;  // Prevent default back behavior
+  };
+
+  const _handleAppStateChange = (nextAppState) => {
+    if (appState.match(/inactive|background/) && nextAppState === 'active') {
+      console.log('App has come to the foreground!');
+    } else if (nextAppState === 'background') {
+      console.log('App has gone to the background!');
+      soundRef.current?.stop();  // 停止播放声音
+    }
+    // setAppState(nextAppState);
+  };
+
   return (
     <SafeAreaView>
       <View style={{ marginTop: 0, height: "100%" }}>
@@ -46,7 +81,6 @@ function Sign({ navigation }): React.JSX.Element {
             <SignaturePad
               penMinWidth={penMinWidth}
               penMaxWidth={penMaxWidth}
-              onChange={_signaturePadChange}
               style={{ flex: 1, backgroundColor: "white" }}
               useFont={false}
             />
@@ -55,7 +89,7 @@ function Sign({ navigation }): React.JSX.Element {
                 s.stop().release()
               }
               isActive = false;
-              navigation.navigate("PdfPageNoticeWithSign", { sign_64: final_sign_data });
+              navigation.navigate("PdfPageNoticeWithSign");
             }}></Button>
           </View>
 

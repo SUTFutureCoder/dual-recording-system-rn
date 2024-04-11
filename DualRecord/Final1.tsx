@@ -1,32 +1,64 @@
-import React, { useEffect, useState } from "react";
-import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { AppState, BackHandler, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
 import Orientation from "react-native-orientation-locker";
 import { Camera, useCameraDevice } from "react-native-vision-camera";
 import Sound from "react-native-sound";
 
 function Final1({ navigation }): React.JSX.Element {
+  Orientation.lockToLandscapeLeft();
+  const [appState, setAppState] = useState(AppState.currentState);
+  const soundRef = useRef(null);  // 使用 useRef 来持久化声音实例
   useEffect(() => {
-    stage15();
-    Camera.requestCameraPermission();
-    Orientation.lockToLandscapeLeft();
+    // App state change listener
+    const appStateListener = AppState.addEventListener("change", _handleAppStateChange);
+
+    // Hardware back press listener
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", handleBackPress);
+
+    return () => {
+      // Clean up: release sound and remove listeners
+      soundRef.current?.release();
+      appStateListener.remove();
+      backHandler.remove();
+    };
   }, []);
 
   let device = useCameraDevice("front");
   let isActive = true;
-  Orientation.lockToLandscapeLeft();
+  // Orientation.lockToLandscapeLeft();
 
 
   const stage15 = () => {
     const sound = new Sound(require("./assets/stage15.mp3"), (error) => {
+      soundRef.current = sound;
       if (!error) {
         sound.play((success) => {
           if (success) {
             console.log("音频15播放完成");
           }
           sound.release();
+          soundRef.current = null;
         });
       }
     });
+  };
+
+  stage15();
+
+  const handleBackPress = () => {
+    soundRef.current?.stop();  // 停止播放声音
+    navigation.goBack();
+    return true;  // Prevent default back behavior
+  };
+
+  const _handleAppStateChange = (nextAppState) => {
+    if (appState.match(/inactive|background/) && nextAppState === 'active') {
+      console.log('App has come to the foreground!');
+    } else if (nextAppState === 'background') {
+      console.log('App has gone to the background!');
+      soundRef.current?.stop();  // 停止播放声音
+    }
+    // setAppState(nextAppState);
   };
 
   const [showFinal1, setShowFinal1] = useState(true);

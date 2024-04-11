@@ -21,6 +21,7 @@ import PdfPageClaimerWithSign from "./PdfPageClaimerWithSign.tsx";
 import PdfPageNoticeWithSign from "./PdfPageNoticeWithSign.tsx";
 import Final1 from "./Final1.tsx";
 import Last1 from "./Last1.tsx";
+import PdfPageSample from "./PdfPageSample.tsx";
 
 type RootStackNavigatorParamsList = {
   Start: undefined;
@@ -36,13 +37,13 @@ type RootStackNavigatorParamsList = {
   PdfPageNoticeWithSign: undefined;
   Final1: undefined;
   Last1: undefined;
+  PdfPageSample: undefined;
 };
 
 const Stack = createStackNavigator<RootStackNavigatorParamsList>();
 
 function App(): React.JSX.Element {
 
-  let order_id = Math.floor(1000000000 + Math.random() * 9000000000).toString().replace(/^0/, String(Math.floor(1 + Math.random() * 9)));
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -59,6 +60,7 @@ function App(): React.JSX.Element {
         <Stack.Screen name="PdfPageNoticeWithSign" component={PdfPageNoticeWithSign} options={{  headerShown: false  }}/>
         <Stack.Screen name="Final1" component={Final1} options={{  headerShown: false  }}/>
         <Stack.Screen name="Last1" component={Last1} options={{  headerShown: false  }}/>
+        <Stack.Screen name="PdfPageSample" component={PdfPageSample} options={{  headerShown: false  }}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

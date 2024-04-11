@@ -1,18 +1,39 @@
-import React from "react";
-import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { AppState, BackHandler, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Sound from "react-native-sound";
+import { Camera } from "react-native-vision-camera";
+import Orientation from "react-native-orientation-locker";
 
 const screenWidth = Dimensions.get("window").width; // 获取屏幕宽度
 const screenHeight = Dimensions.get("window").height; // 获取屏幕宽度
 function Logo({ navigation }): React.JSX.Element {
+  Orientation.lockToLandscapeLeft();
+  const [appState, setAppState] = useState(AppState.currentState);
+  const soundRef = useRef(null);  // 使用 useRef 来持久化声音实例
+  useEffect(() => {
+    // App state change listener
+    const appStateListener = AppState.addEventListener("change", _handleAppStateChange);
+
+    // Hardware back press listener
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", handleBackPress);
+
+    return () => {
+      // Clean up: release sound and remove listeners
+      soundRef.current?.release();
+      appStateListener.remove();
+      backHandler.remove();
+    };
+  }, []);
 
   let s : Sound
   const stage16 = () => {
     const sound = new Sound(require("./assets/stage16.mp3"), (error) => {
       s = sound
+      soundRef.current = sound;
       if (!error) {
         sound.play((success) => {
           sound.release();
+          soundRef.current = null;
           if (success) {
             console.log("音频14播放完成");
           }
@@ -20,6 +41,24 @@ function Logo({ navigation }): React.JSX.Element {
       }
     });
   };
+
+
+  const handleBackPress = () => {
+    soundRef.current?.stop();  // 停止播放声音
+    navigation.goBack();
+    return true;  // Prevent default back behavior
+  };
+
+  const _handleAppStateChange = (nextAppState) => {
+    if (appState.match(/inactive|background/) && nextAppState === 'active') {
+      console.log('App has come to the foreground!');
+    } else if (nextAppState === 'background') {
+      console.log('App has gone to the background!');
+      soundRef.current?.stop();  // 停止播放声音
+    }
+    setAppState(nextAppState);
+  };
+
 
   stage16();
   return (
