@@ -25,9 +25,10 @@ function PdfPageNoticeWithSign({ navigation }): React.JSX.Element {
     Orientation.lockToLandscapeLeft();
   }, []);
 
-
+  let s: Sound
   const stage13 = () => {
     const sound = new Sound(require("./assets/stage13.mp3"), (error) => {
+      s = sound
       if (!error) {
         sound.play((success) => {
           sound.release();
@@ -65,7 +66,11 @@ function PdfPageNoticeWithSign({ navigation }): React.JSX.Element {
                 <TouchableOpacity style={styles.button1} onPress={() => navigation.navigate("PdfPageNoticeWithSign")}>
                   <Text style={styles.buttonText}>刷新</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button2} onPress={() => navigation.navigate("PdfPageClaimerWithSign")}>
+                <TouchableOpacity style={styles.button2} onPress={() => {
+                  if (s !== undefined) {
+                    s.stop().release()
+                  }
+                  navigation.navigate("PdfPageClaimerWithSign")}}>
                   <Text style={styles.buttonText}>核对完毕</Text>
                 </TouchableOpacity>
               </View>

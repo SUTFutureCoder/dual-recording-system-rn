@@ -15,9 +15,10 @@ function Id({ navigation }): React.JSX.Element {
   let isActive = true;
   Orientation.lockToLandscapeLeft();
 
-
+  let s: Sound;
   const stage6 = () => {
     const sound = new Sound(require("./assets/stage6.mp3"), (error) => {
+      s = sound
       if (!error) {
         sound.play((success) => {
           if (success) {
@@ -66,7 +67,11 @@ function Id({ navigation }): React.JSX.Element {
               <TouchableOpacity style={styles.button1} onPress={() => navigation.navigate("Id")}>
                 <Text style={styles.buttonText}>刷新</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.button2} onPress={() => navigation.navigate("PdfPage")}>
+              <TouchableOpacity style={styles.button2} onPress={() => {
+              if (s !== undefined) {
+                s.stop().release()
+              }
+              navigation.navigate("PdfPage")}}>
                 <Text style={styles.buttonText}>核对完毕</Text>
               </TouchableOpacity>
             </View>

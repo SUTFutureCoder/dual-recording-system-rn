@@ -25,9 +25,11 @@ function PdfPageClaimer({ navigation }): React.JSX.Element {
     Orientation.lockToLandscapeLeft();
   }, []);
 
+  let s: Sound
 
   const stage9 = () => {
     const sound = new Sound(require("./assets/stage9.mp3"), (error) => {
+      s = sound
       if (!error) {
         sound.play((success) => {
           sound.release();
@@ -67,7 +69,11 @@ function PdfPageClaimer({ navigation }): React.JSX.Element {
                 <TouchableOpacity style={styles.button1} onPress={() => navigation.navigate("PdfPageClaimer")}>
                   <Text style={styles.buttonText}>刷新</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button2} onPress={() => navigation.navigate("Sign")}>
+                <TouchableOpacity style={styles.button2} onPress={() => {
+                  if (s !== undefined) {
+                    s.stop().release()
+                  }
+                  navigation.navigate("Sign")}}>
                   <Text style={styles.buttonText}>核对完毕</Text>
                 </TouchableOpacity>
               </View>

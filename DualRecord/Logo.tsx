@@ -5,8 +5,11 @@ import Sound from "react-native-sound";
 const screenWidth = Dimensions.get("window").width; // 获取屏幕宽度
 const screenHeight = Dimensions.get("window").height; // 获取屏幕宽度
 function Logo({ navigation }): React.JSX.Element {
+
+  let s : Sound
   const stage16 = () => {
     const sound = new Sound(require("./assets/stage16.mp3"), (error) => {
+      s = sound
       if (!error) {
         sound.play((success) => {
           sound.release();
@@ -45,7 +48,11 @@ function Logo({ navigation }): React.JSX.Element {
             fontSize: 15
           }}>本次录制即将结束，销售人员和客户如有补充说明请在此环节补充。如无补充，请点击结束录制</Text>
           <View style={{ flexDirection: "row" }}>
-            <TouchableOpacity style={styles.button2} onPress={() => navigation.navigate("Last1")}>
+            <TouchableOpacity style={styles.button2} onPress={() => {
+              if (s !== undefined) {
+                s.stop().release()
+              }
+              navigation.navigate("Last1")}}>
               <Text style={styles.buttonText}>结束录制</Text>
             </TouchableOpacity>
           </View>

@@ -26,8 +26,10 @@ function PdfPage({ navigation }): React.JSX.Element {
   }, []);
 
 
+  let s: Sound
   const stage7 = () => {
     const sound = new Sound(require("./assets/stage7.mp3"), (error) => {
+      s = sound
       if (!error) {
         sound.play((success) => {
           sound.release();
@@ -44,6 +46,7 @@ function PdfPage({ navigation }): React.JSX.Element {
   const stage8 = () => {
     setRightGif(sound_gif);
     const sound = new Sound(require("./assets/stage8.mp3"), (error) => {
+      s = sound
       if (!error) {
         sound.play((success) => {
           sound.release();
@@ -84,7 +87,11 @@ function PdfPage({ navigation }): React.JSX.Element {
                 <TouchableOpacity style={styles.button1} onPress={() => navigation.navigate("PdfPage")}>
                   <Text style={styles.buttonText}>刷新</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button2} onPress={() => navigation.navigate("PdfPageDisclaimer")}>
+                <TouchableOpacity style={styles.button2} onPress={() => {
+                  if (s !== undefined) {
+                    s.stop().release()
+                  }
+                  navigation.navigate("PdfPageDisclaimer")}}>
                   <Text style={styles.buttonText}>核对完毕</Text>
                 </TouchableOpacity>
               </View>

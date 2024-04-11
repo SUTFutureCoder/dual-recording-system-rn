@@ -24,8 +24,10 @@ function Sign({ navigation }): React.JSX.Element {
     Orientation.lockToLandscapeLeft();
   }, []);
 
+  let s: Sound
   const stage12 = () => {
     const sound = new Sound(require("./assets/stage12.mp3"), (error) => {
+      s = sound
       if (!error) {
         sound.play((success) => {
           sound.release();
@@ -49,6 +51,9 @@ function Sign({ navigation }): React.JSX.Element {
               useFont={false}
             />
             <Button color={"#ff361e"} title={"提交"} onPress={() => {
+              if (s !== undefined) {
+                s.stop().release()
+              }
               isActive = false;
               navigation.navigate("PdfPageNoticeWithSign", { sign_64: final_sign_data });
             }}></Button>
